@@ -15,10 +15,25 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 const corsOptions = {
-  origin: [
-    ...process.env.FRONTEND_URL.split(','),
-    process.env.ADMIN_PANEL_URL
-  ].filter(Boolean),
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://pragati1-762f5.web.app',
+      'https://pragati-c2a04.web.app',
+      'http://127.0.0.1:5500',
+      'http://localhost:5500',
+      'http://localhost:3000',
+      'http://localhost:5000'
+    ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 };
 app.use(cors(corsOptions));
