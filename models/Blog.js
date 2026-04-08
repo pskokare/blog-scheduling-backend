@@ -58,7 +58,6 @@ const blogSchema = new mongoose.Schema({
   // Publishing and Scheduling
   status: {
     type: String,
-    enum: ['draft', 'published', 'scheduled'],
     default: 'draft'
   },
   publishedAt: {
