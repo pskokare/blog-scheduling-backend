@@ -7,9 +7,13 @@ const {
   updateAuthor,
   deleteAuthor
 } = require('../controllers/authorController');
+const upload = require('../middleware/upload');
 
 // Author routes
-router.post('/', createAuthor);
+router.post('/', 
+  upload.single('profilepicture'), 
+  createAuthor
+);
 router.get('/', getAllAuthors);
 router.get('/:id', getAuthorById);
 router.put('/:id', updateAuthor);

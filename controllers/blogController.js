@@ -4,9 +4,7 @@ const { processHeadingHierarchySimple } = require('../utils/headingHelper');
 const { indianTimeToUTC } = require('../utils/timezoneHelper');
 const slugify = require('slugify');
 
-// @desc    Create a new blog
-// @route   POST /api/blogs
-// @access  Private (Admin)
+
 exports.createBlog = async (req, res) => {
   try {
     const {
@@ -49,7 +47,7 @@ exports.createBlog = async (req, res) => {
         : [req.files.contentImages];
       
       for (const file of contentImageFiles) {
-        contentImages.push(file.secure_url);
+        contentImages.push(file.path);
       }
     }
 
@@ -74,7 +72,7 @@ exports.createBlog = async (req, res) => {
       tags: Array.isArray(tags) ? tags : [tags],
       metaTitle,
       metaDescription,
-      coverImage: req.files && req.files.coverImage ? req.files.coverImage[0].secure_url : '',
+      coverImage: req.files && req.files.coverImage ? req.files.coverImage[0].path : '',
       contentImages,
       content: processedContent,
       status: status || 'draft',
@@ -110,9 +108,7 @@ exports.createBlog = async (req, res) => {
   }
 };
 
-// @desc    Get all blogs (for admin)
-// @route   GET /api/blogs
-// @access  Private (Admin)
+
 exports.getAllBlogs = async (req, res) => {
   try {
     const { page = 1, limit = 10, status, category, search } = req.query;
@@ -170,9 +166,7 @@ exports.getAllBlogs = async (req, res) => {
   }
 };
 
-// @desc    Get blog by slug
-// @route   GET /api/blogs/:slug
-// @access  Public
+
 exports.getBlogBySlug = async (req, res) => {
   try {
     const blog = await Blog.findOne({ slug: req.params.slug });

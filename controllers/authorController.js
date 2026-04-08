@@ -5,12 +5,32 @@ const Author = require('../models/Author');
 // @access  Private (Admin)
 exports.createAuthor = async (req, res) => {
   try {
-    const { name, email, bio, avatar, social } = req.body;
+    const { name, email, bio, social } = req.body;
 
-    if (!name || !email) {
+    console.log('Request body:', req.body);
+    console.log('Uploaded file:', req.file);
+
+    // Validate required fields
+    if (!name || name.trim() === '') {
       return res.status(400).json({
         success: false,
-        message: 'Please provide name and email'
+        message: 'Please provide name'
+      });
+    }
+
+    if (!email || email.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email'
+      });
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email'
       });
     }
 
@@ -23,12 +43,43 @@ exports.createAuthor = async (req, res) => {
       });
     }
 
+    // Handle profile picture file upload
+    let profilePictureUrl = '';
+    if (req.file) {
+      // Use the secure_url from Cloudinary upload
+      profilePictureUrl = req.file.secure_url || req.file.path;
+    }
+
+    // Parse social links safely
+    let parsedSocial = {
+      twitter: '',
+      linkedin: '',
+      github: '',
+      website: ''
+    };
+    if (social && social.trim() !== '') {
+      try {
+        parsedSocial = JSON.parse(social);
+        // Ensure all social fields exist
+        parsedSocial = {
+          twitter: parsedSocial.twitter || '',
+          linkedin: parsedSocial.linkedin || '',
+          github: parsedSocial.github || '',
+          website: parsedSocial.website || ''
+        };
+      } catch (parseError) {
+        console.error('Error parsing social links:', parseError);
+        console.log('Social field value:', social);
+        // Use default values if JSON parsing fails
+      }
+    }
+
     const author = new Author({
       name,
       email,
       bio,
-      avatar: avatar || '',
-      social: social || {}
+      avatar: profilePictureUrl, // Still using avatar field in database but populated from profilepicture
+      social: parsedSocial
     });
 
     await author.save();
@@ -71,9 +122,7 @@ exports.getAllAuthors = async (req, res) => {
   }
 };
 
-// @desc    Get author by ID
-// @route   GET /api/authors/:id
-// @access  Public
+
 exports.getAuthorById = async (req, res) => {
   try {
     const author = await Author.findById(req.params.id);
@@ -99,9 +148,7 @@ exports.getAuthorById = async (req, res) => {
   }
 };
 
-// @desc    Update author
-// @route   PUT /api/authors/:id
-// @access  Private (Admin)
+
 exports.updateAuthor = async (req, res) => {
   try {
     const { name, bio, avatar, social, isActive } = req.body;

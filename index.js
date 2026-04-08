@@ -25,7 +25,16 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/blog-sche
 const app = express();
 
 // Middleware
-app.use(cors({ origin: true }));
+app.use(cors({
+  origin: [
+    'https://pragati-c2a04.web.app',
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+    'http://127.0.0.1:3000',
+    'http://localhost:3000'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
