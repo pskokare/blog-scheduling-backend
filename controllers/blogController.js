@@ -49,7 +49,7 @@ exports.createBlog = async (req, res) => {
         : [req.files.contentImages];
       
       for (const file of contentImageFiles) {
-        contentImages.push(file.path);
+        contentImages.push(file.secure_url);
       }
     }
 
@@ -74,7 +74,7 @@ exports.createBlog = async (req, res) => {
       tags: Array.isArray(tags) ? tags : [tags],
       metaTitle,
       metaDescription,
-      coverImage: req.files && req.files.coverImage ? req.files.coverImage[0].path : '',
+      coverImage: req.files && req.files.coverImage ? req.files.coverImage[0].secure_url : '',
       contentImages,
       content: processedContent,
       status: status || 'draft',
